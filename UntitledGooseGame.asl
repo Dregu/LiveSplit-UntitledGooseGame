@@ -97,6 +97,7 @@ init {
 	} catch {
 		print("Cant open goose log");
 	}
+	vars.isPaused = false;
 	vars.line = "";
 	vars.reader = new StreamReader(new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)); 
 }
