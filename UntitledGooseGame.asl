@@ -1,6 +1,6 @@
 state("Untitled") {
 	int honk : "UnityPlayer.dll", 0x1497D10, 0x9C0;
-	int reset: "UnityPlayer.dll", 0x14B1800, 0x330, 0x70, 0x338;
+	int reset: "UnityPlayer.dll", 0x14B1800, 0x330, 0x470;
 }
 
 startup {
@@ -80,7 +80,7 @@ startup {
 	settings.Add("reset", true, "Resetting the Timer");
 		settings.Add("newfile", true, "when creating a new Save", "reset");
 		settings.Add("restart", false, "after confirming Restart or Quit", "reset");
-		settings.Add("mainmenu", false, "upon quitting to the Main Menu", "reset");
+		settings.Add("mainmenu", false, "only after confirming Quit", "reset");
 
 	settings.Add("pause", false, "Pausing the Timer (not allowed for speedruns)");
 		settings.Add("loading", false, "while Loading", "pause");
