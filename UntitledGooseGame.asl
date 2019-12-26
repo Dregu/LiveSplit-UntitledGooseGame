@@ -1,6 +1,6 @@
 state("Untitled") {
 	int honk : "UnityPlayer.dll", 0x1497D10, 0x9C0;
-	int reset: "UnityPlayer.dll", 0x14B1800, 0x330, 0x470;
+	int reset: "UnityPlayer.dll", 0x14B1800, 0x330, 0x480;
 }
 
 startup {
