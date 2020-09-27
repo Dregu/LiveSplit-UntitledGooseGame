@@ -4,78 +4,123 @@ state("Untitled") {
 }
 
 startup {
+	vars.subGoalChecker = new Dictionary<string, List<string>>();
+	vars.subGoalCheckerClone = new Dictionary<string, List<string>>(); // Create a clone of the dictionary so it can be re-populated.
+	var settingsCreator = new Dictionary<string, string> {
+		{"splits-intro", "intro logo"},
+		{"splits-page1", "to do (garden)"},
+			{"page1-goalGarden", "get into the garden"},
+			{"page1-goalWet", "get the groundskeeper wet"},
+			{"page1-goalKeys", "steal the groundskeeper's keys"},
+			{"page1-goalHat", "make the groundskeeper wear his sun hat"},
+			{"page1-goalRake", "rake in the lake"},
+			{"page1-goalPicnic", "have a picnic"},
+				{"goalPicnic-subGoalSandwich", "bring a sandwich"},
+				{"goalPicnic-subGoalApple", "bring an apple"},
+				{"goalPicnic-subGoalPumpkin", "bring a pumpkin"},
+				{"goalPicnic-subGoalCarrot", "bring a carrot"},
+				{"goalPicnic-subGoalJam", "bring some jam"},
+				{"goalPicnic-subGoalThermos", "bring a thermos"},
+				{"goalPicnic-subGoalRadio", "bring a radio"},
+				{"goalPicnic-subGoalBasket", "bring a basket"},
+			{"page1-goalHammering", "make the groundskeeper hammer his thumb"},
+
+		{"splits-page2", "to do (high street)"},
+			{"page2-goalBroom", "break the broom"},
+			{"page2-goalPhonebooth", "trap the boy in the phone booth"},
+			{"page2-goalWrongGlasses", "make the boy wear the wrong glasses"},
+			{"page2-goalBuyBack", "make someone buy back their own stuff"},
+			{"page2-goalGetInShop", "get on t.v."},
+			{"page2-goalShopping", "go shopping"},
+				{"goalShopping-subGoalToothbrush", "buy a toothbrush"},
+				{"goalShopping-subGoalToiletPaper", "buy some loo paper"},
+				{"goalShopping-subGoalHairbrush", "buy a hairbrush"},
+				{"goalShopping-subGoalTinCans", "buy some tinned food"},
+				{"goalShopping-subGoalCleaners", "buy some cleaner"},
+				{"goalShopping-subGoalFruitNVeg", "buy some fruit & veg"},
+			{"page2-goalGarage", "trap the shopkeeper in the garage"},
+
+		{"splits-page3", "to do (back gardens)"},
+			{"page3-goalBreakVase", "make someone break the fancy vase"},
+			{"page3-goalDressStatue", "help the woman dress up the bust"},
+			{"page3-goalBell", "make the man spit out his tea"},
+			{"page3-goalRibbon", "get dressed up with a ribbon"},
+			{"page3-goalBarefoot", "make the man go barefoot"},
+			{"page3-goalWashing", "do the washing"},
+				{"goalWashing-subGoalBra", "with a bra"},
+				{"goalWashing-subGoalSocks", "with a pair of socks"},
+				{"goalWashing-subGoalSlippers", "with a slipper"},
+				{"goalWashing-subGoalSoap", "with a bar of soap"},
+			{"page3-goalPrune", "make someone prune the prize rose"},
+
+		{"splits-page4", "to do (pub)"},
+			{"page4-goalIntoPub", "get into the pub"},
+			{"page4-goalOldMan1", "break the dartboard"},
+			{"page4-goalBoat", "get the toy boat"},
+			{"page4-goalOldMan2", "make the old man fall on his bum"},
+			{"page4-goalFlower", "be awarded a flower"},
+			{"page4-goalPintGlass", "steal a pint glass and drop it in the canal"},
+			{"page4-goalSetTable", "set the table"},
+				{"goalSetTable-subGoalKnife", "with a knife"},
+				{"goalSetTable-subGoalFork", "with a fork"},
+				{"goalSetTable-subGoalPlate", "with a plate"},
+				{"goalSetTable-subGoalPepper", "with pepper"},
+				{"goalSetTable-subGoalCandle", "with a candle"},
+			{"page4-goalBucket", "drop a bucket on the burly man's head"},
+
+		{"splits-page5", "to do (model village)"},
+			{"page5-goalModelVillage", "get into the model village"},
+			{"page5-goalStealBell", "steal the beautiful miniature golden bell"},
+			{"page5-goalFinale", "...and take it all the way back home"},
+
+		{"splits-page6", "to do (as well)"},
+			{"page6-goalLockout", "lock the groundskeeper out of the garden"},
+			{"page6-goalCabbage", "cabbage picnic"},
+			{"page6-goalPuddle", "trip the boy in the puddle"},
+			{"page6-goalScales", "make the shop scales go ding"},
+			{"page6-goalUmbrella", "open an umbrella inside the tv shop"},
+			{"page6-goalBuyBack2", "make someone from outside the high street buy back their own stuff"},
+			{"page6-goalFlowers", "collect the five flowers"},
+				{"goalFlowers-subGoalTulip", "tulip"},
+				{"goalFlowers-subGoalLily", "lily"},
+				{"goalFlowers-subGoalRose", "rose"},
+				{"goalFlowers-subGoalDaisy", "daisy"},
+				{"goalFlowers-subGoalFinaleFlower", "chrysanthemum"},
+
+		{"splits-page7", "to do (as well)"},
+			{"page7-goalWimpGarage", "trap the boy in the garage"},
+			{"page7-goalCatch", "catch an object as it's thrown over the fence"},
+			{"page7-goalThrownGoose", "get thrown over the fence"},
+			{"page7-goalBust2", "dress up the bust with things from outside the back gardens"},
+			{"page7-goalFootball", "score a goal"},
+			{"page7-goalBoatBridge", "sail the toy boat under a bridge"},
+			{"page7-goalPerformRibbon", "perform at the pub wearing a ribbon"},
+			{"page7-goalOldManHat", "steal the old man's woolen hat"},
+
+		{"splits-page8", "to do (quickly!!)"},
+			{"page8-goalSpeedyGarden", "complete the garden to-do list before the church bells ring"},
+			{"page8-goalSpeedyShops", "complete the high street to-do list before the church bells ring"},
+			{"page8-goalSpeedyBackyards", "complete the back gardens to-do list before the church bells ring"},
+			{"page8-goalSpeedyPub", "complete the pub to-do list before the church bells ring"},
+
+		{"splits-page9", "to do (finally)"},
+			{"page9-goal100", "cross out everything on the to-do list"}
+	};
+
 	settings.Add("splits", true, "Splitting on Finished Tasks");
-		settings.Add("intro", true, "intro logo", "splits");
 
-		settings.Add("page1", false, "to do (garden)", "splits");
-			settings.Add("goalGarden", false, "get into the garden", "page1");
-			settings.Add("goalWet", false, "get the groundskeeper wet", "page1");
-			settings.Add("goalKeys", false, "steal the groundskeeper's keys", "page1");
-			settings.Add("goalHat", false, "make the groundskeeper wear his sun hat", "page1");
-			settings.Add("goalRake", false, "rake in the lake", "page1");
-			settings.Add("goalPicnic", false, "have a picnic", "page1");
-			settings.Add("goalHammering", false, "make the groundskeeper hammer his thumb", "page1");
-
-		settings.Add("page2", false, "to do (high street)", "splits");
-			settings.Add("goalBroom", false, "break the broom", "page2");
-			settings.Add("goalPhonebooth", false, "trap the boy in the phone booth", "page2");
-			settings.Add("goalWrongGlasses", false, "make the boy wear the wrong glasses", "page2");
-			settings.Add("goalBuyBack", false, "make someone buy back their own stuff", "page2");
-			settings.Add("goalGetInShop", false, "get on t.v.", "page2");
-			settings.Add("goalShopping", false, "go shopping", "page2");
-			settings.Add("goalGarage", false, "trap the shopkeeper in the garage", "page2");
-
-		settings.Add("page3", false, "to do (back gardens)", "splits");
-			settings.Add("goalBreakVase", false, "make someone break the fancy vase", "page3");
-			settings.Add("goalDressStatue", false, "help the woman dress up the bust", "page3");
-			settings.Add("goalBell", false, "make the man spit out his tea", "page3");
-			settings.Add("goalRibbon", false, "get dressed up with a ribbon", "page3");
-			settings.Add("goalBarefoot", false, "make the man go barefoot", "page3");
-			settings.Add("goalWashing", false, "do the washing", "page3");
-			settings.Add("goalPrune", false, "make someone prune the prize rose", "page3");
-
-		settings.Add("page4", true, "to do (pub)", "splits");
-			settings.Add("goalIntoPub", true, "get into the pub", "page4");
-			settings.Add("goalOldMan1", false, "break the dartboard", "page4");
-			settings.Add("goalBoat", false, "get the toy boat", "page4");
-			settings.Add("goalOldMan2", false, "make the old man fall on his bum", "page4");
-			settings.Add("goalFlower", false, "be awarded a flower", "page4");
-			settings.Add("goalPintGlass", false, "steal a pint glass and drop it in the canal", "page4");
-			settings.Add("goalSetTable", false, "set the table", "page4");
-			settings.Add("goalBucket", false, "drop a bucket on the burly man's head", "page4");
-
-		settings.Add("page5", true, "to do (model village)", "splits");
-			settings.Add("goalModelVillage", true, "get into the model village", "page5");
-			settings.Add("goalStealBell", true, "steal the beautiful miniature golden bell", "page5");
-			settings.Add("goalFinale", true, "...and take it all the way back home", "page5");
-
-		settings.Add("page6", false, "to do (as well)", "splits");
-			settings.Add("goalLockout", false, "lock the groundskeeper out of the garden", "page6");
-			settings.Add("goalCabbage", false, "cabbage picnic", "page6");
-			settings.Add("goalPuddle", false, "trip the boy in the puddle", "page6");
-			settings.Add("goalScales", false, "make the shop scales go ding", "page6");
-			settings.Add("goalUmbrella", false, "open an umbrella inside the tv shop", "page6");
-			settings.Add("goalBuyBack2", false, "make someone from outside the high street buy back their own stuff", "page6");
-			settings.Add("goalFlowers", false, "collect the five flowers", "page6");
-
-		settings.Add("page7", false, "to do (as well)", "splits");
-			settings.Add("goalWimpGarage", false, "trap the boy in the garage", "page7");
-			settings.Add("goalCatch", false, "catch an object as it's thrown over the fence", "page7");
-			settings.Add("goalThrownGoose", false, "get thrown over the fence", "page7");
-			settings.Add("goalBust2", false, "dress up the bust with things from outside the back gardens", "page7");
-			settings.Add("goalFootball", false, "score a goal", "page7");
-			settings.Add("goalBoatBridge", false, "sail the toy boat under a bridge", "page7");
-			settings.Add("goalPerformRibbon", false, "perform at the pub wearing a ribbon", "page7");
-			settings.Add("goalOldManHat", false, "steal the old man's woolen hat", "page7");
-
-		settings.Add("page8", false, "to do (quickly!!)", "splits");
-			settings.Add("goalSpeedyGarden", false, "complete the garden to-do list before the church bells ring", "page8");
-			settings.Add("goalSpeedyShops", false, "complete the high street to-do list before the church bells ring", "page8");
-			settings.Add("goalSpeedyBackyards", false, "complete the back gardens to-do list before the church bells ring", "page8");
-			settings.Add("goalSpeedyPub", false, "complete the pub to-do list before the church bells ring", "page8");
+	foreach (var setting in settingsCreator) {
+		settings.Add(setting.Key.Split('-')[1], false, setting.Value, setting.Key.Split('-')[0]); // Add settings.
+		if (setting.Key.Split('-')[1].StartsWith("subGoal")) {									// Check if a subGoal has been recognized.
+			if (vars.subGoalChecker.ContainsKey(setting.Key.Split('-')[0]))							// Check if a dictionary key with the goal's name exists.
+				vars.subGoalChecker[setting.Key.Split('-')[0]].Add(setting.Key.Split('-')[1]);				// If true, add the subGoal to that goal's list.
+			else														//
+				vars.subGoalChecker.Add(setting.Key.Split('-')[0], new List<string>{setting.Key.Split('-')[1]});	// If false, create new dictionary key and add the subGoal.
+		}
+	}
 	
-		settings.Add("page9", false, "to do (finally)", "splits");
-			settings.Add("goal100", false, "cross out everything on the to-do list", "page9");
+	foreach (var item in vars.subGoalChecker)
+		vars.subGoalCheckerClone.Add(item.Key, item.Value); // Populate dictionary clone.
 
 	settings.Add("reset", true, "Resetting the Timer");
 		settings.Add("newfile", true, "when creating a new Save", "reset");
@@ -85,7 +130,7 @@ startup {
 	settings.Add("pause", false, "Pausing the Timer (not allowed for speedruns)");
 		settings.Add("loading", false, "while Loading", "pause");
 		settings.Add("menu", false, "when opening the Menu", "pause");
-		settings.Add("all", false, "while not playing (only works when all 3 options are enabled)", "pause");
+		settings.Add("all", false, "while not playing", "pause");
 }
 
 init {
@@ -95,11 +140,16 @@ init {
 		fs.SetLength(0);
 		fs.Close();
 	} catch {
-		print("Cant open goose log");
+		print(">>>>> Cannot open Goose log!");
 	}
+
+	vars.subGoalChecker.Clear();				// Completely clear dictionary.
+	foreach (var item in vars.subGoalCheckerClone)		//
+		vars.subGoalChecker.Add(item.Key, item.Value);	// Re-populate dictionary.
 	vars.isPaused = false;
 	vars.line = "";
-	vars.reader = new StreamReader(new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)); 
+	vars.reader = new StreamReader(new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+	vars.lastSubGoal = "";
 }
  
 exit {
@@ -108,39 +158,50 @@ exit {
 }
 
 update {
-	if (vars.reader == null) return false;
+	if (vars.reader == null)
+		return false;
 	vars.line = vars.reader.ReadLine();
-	if (settings["menu"] && vars.line != null && vars.line.StartsWith("Setting controller maps to UI Mode")) {
+
+	if (vars.line != null && (vars.line.StartsWith("Setting controller maps to UI Mode") || vars.line.StartsWith("unloading. game world active false")))
 		vars.isPaused = true;
-	} else if (settings["menu"] && vars.line != null && vars.line.StartsWith("Setting controller maps to Gameplay Mode")) {
+	else if (vars.line != null && (vars.line.StartsWith("Setting controller maps to Gameplay Mode") || vars.line != null && vars.line.StartsWith("loading! game world active true")))
 		vars.isPaused = false;
-	} else if (settings["loading"] && vars.line != null && vars.line.StartsWith("unloading. game world active false")) {
-		vars.isPaused = true;
-	} else if (settings["loading"] && vars.line != null && vars.line.StartsWith("loading! game world active true")) {
-		vars.isPaused = false;
+}
+
+start {
+	if (old.honk == 16 && (current.honk == 17 || current.honk == 18)) {
+		vars.subGoalChecker.Clear();				// Completely clear dictionary.
+		foreach (var item in vars.subGoalCheckerClone)		//
+			vars.subGoalChecker.Add(item.Key, item.Value);	// Re-populate dictionary to start anew.
+		return true;
 	}
 }
 
-
-start {
-	return (old.honk == 16 && current.honk == 17);
-}
-
 reset {
-	return 
-		(settings["newfile"] && vars.line != null && vars.line.StartsWith("savefile doesn't exist")) ||
-	    (settings["restart"] && vars.line != null && vars.line.StartsWith("unloading. game world active false")) ||
-		(settings["mainmenu"] && current.reset == 1);
+	return vars.line != null && (settings["newfile"] && vars.line.StartsWith("savefile doesn't exist") || settings["restart"] && vars.line.StartsWith("unloading. game world active false")) ||
+		settings["mainmenu"] && current.reset == 1;
 }
 
 split {
 	if (vars.line != null && vars.line.StartsWith("saved due to goal")) {
 		var goal = vars.line.Split(' ')[3];
-		print("got " + goal);
-		return (settings[goal]);
-	} else {
-		return (settings["intro"] && vars.line != null && vars.line.StartsWith("begining intro title sequence"));
+		//print(">>>>> got " + goal);
+		return settings[goal] && !settings[vars.lastSubGoal];
 	}
+
+	if (vars.line != null && vars.line.StartsWith("awarding: awardSubGoal-subGoal")) {
+		var subGoal = vars.line.Split('-')[1];
+		//print(">>>>> got " + subGoal);
+		foreach (var goalList in vars.subGoalChecker) {
+			if (goalList.Value.Contains(subGoal)) {				// Check if any items in the dictionary contain the subGoal.
+				vars.lastSubGoal = subGoal;				// Set lastSubGoal, so a double split can't occur in the above logic.
+				goalList.Value.Remove(subGoal);				// Remove that subGoal from the list (to circumvent duplicate splits).
+				return settings[subGoal] && goalList.Value.Count != 0;	// Split if the setting has been selected and the list isn't empty (would otherwise split twice because of the normal goal).
+			}
+		}
+	}
+
+	return settings["intro"] && vars.line != null && vars.line.StartsWith("begining intro title sequence");
 }
 
 isLoading {
@@ -152,13 +213,13 @@ isLoading {
 	} else if (settings["menu"] && !settings["all"]) {
 		return
 			vars.isPaused;
-	} else if (settings["all"] && settings["loading"] && settings["menu"]) {
+	} else if (settings["all"]) {
 		return
 			vars.isPaused ||
 			current.reset == 0 ||
 			current.reset == 1 ||
-			current.honk  == 16 ||
 			current.honk  == 0 ||
-			current.honk  == 13;
+			current.honk  == 13 ||
+			current.honk  == 16;
 	}
 }
