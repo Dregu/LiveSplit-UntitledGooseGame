@@ -6,7 +6,6 @@ state("Untitled") {
 }
 
 startup {
-	vars.amountOfCrowns = 0;
 	vars.subGoalChecker = new Dictionary<string, List<string>>{
 		{"crowns", new List<string> {"crownPin", "paperCrownPin"}}
 	};
@@ -179,7 +178,6 @@ update {
 	current.timerPhase = timer.CurrentPhase;
 	try {
 		if ((old.timerPhase == TimerPhase.Running || old.timerPhase == TimerPhase.Ended) && current.timerPhase == TimerPhase.NotRunning) { // Reset variables when the timer stops. Circumvents delay/lag and incorporates potential manual resets.
-			vars.amountOfCrowns = 0;
 			vars.subGoalChecker.Clear();				// Completely clear dictionary.
 			foreach (var item in vars.subGoalCheckerClone)		//
 				vars.subGoalChecker.Add(item.Key, item.Value);	// Re-populate dictionary to start anew.
