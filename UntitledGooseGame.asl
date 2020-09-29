@@ -1,10 +1,14 @@
 state("Untitled") {
 	int honk : "UnityPlayer.dll", 0x1497D10, 0x9C0;
 	int reset: "UnityPlayer.dll", 0x14B1800, 0x330, 0x480;
+	byte crownPin: "UnityPlayer.dll", 0x154AC08, 0x8, 0x0, 0x30, 0x1F10, 0x118, 0x18, 0x20, 0x90, 0xCC;
+	byte paperCrownPin: "UnityPlayer.dll", 0x154AC08, 0x8, 0x0, 0x30, 0x1F18, 0x118, 0x18, 0x20, 0x90, 0xCC;
 }
 
 startup {
-	vars.subGoalChecker = new Dictionary<string, List<string>>();
+	vars.subGoalChecker = new Dictionary<string, List<string>>{
+		{"crowns", new List<string> {"crownPin", "paperCrownPin"}}
+	};
 	vars.subGoalCheckerClone = new Dictionary<string, List<string>>(); // Create a clone of the dictionary so it can be re-populated.
 	var settingsCreator = new Dictionary<string, string> {
 		{"splits-intro", "intro logo"},
@@ -104,7 +108,11 @@ startup {
 			{"page8-goalSpeedyPub", "complete the pub to-do list before the church bells ring"},
 
 		{"splits-page9", "to do (finally)"},
-			{"page9-goal100", "cross out everything on the to-do list"}
+			{"page9-goal100", "cross out everything on the to-do list"},
+
+		{"splits-crownPin", "put on the royal crown"},
+		{"splits-paperCrownPin", "put on the paper crown"}
+
 	};
 
 	settings.Add("splits", true, "Splitting on Finished Tasks");
@@ -134,7 +142,7 @@ startup {
 }
 
 init {
-	string logPath = Environment.GetEnvironmentVariable("appdata")+"\\..\\LocalLow\\House House\\Untitled Goose Game\\output_log.txt";
+	string logPath = Environment.GetEnvironmentVariable("appdata") + "\\..\\LocalLow\\House House\\Untitled Goose Game\\output_log.txt";
 	try {
 		FileStream fs = new FileStream(logPath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
 		fs.SetLength(0);
@@ -151,7 +159,7 @@ init {
 	vars.reader = new StreamReader(new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 	vars.lastSubGoal = "";
 }
- 
+
 exit {
 	timer.IsGameTimePaused = true;
 	vars.reader = null;
@@ -166,15 +174,19 @@ update {
 		vars.isPaused = true;
 	else if (vars.line != null && (vars.line.StartsWith("Setting controller maps to Gameplay Mode") || vars.line != null && vars.line.StartsWith("loading! game world active true")))
 		vars.isPaused = false;
+
+	current.timerPhase = timer.CurrentPhase;
+	try {
+		if ((old.timerPhase == TimerPhase.Running || old.timerPhase == TimerPhase.Ended) && current.timerPhase == TimerPhase.NotRunning) { // Reset variables when the timer stops. Circumvents delay/lag and incorporates potential manual resets.
+			vars.subGoalChecker.Clear();				// Completely clear dictionary.
+			foreach (var item in vars.subGoalCheckerClone)		//
+				vars.subGoalChecker.Add(item.Key, item.Value);	// Re-populate dictionary to start anew.
+		}
+	} catch {}	// Without the try {} catch {}, this prints an annoying (but harmless) error for 1 iteration.
 }
 
 start {
-	if (old.honk == 16 && (current.honk == 17 || current.honk == 18)) {
-		vars.subGoalChecker.Clear();				// Completely clear dictionary.
-		foreach (var item in vars.subGoalCheckerClone)		//
-			vars.subGoalChecker.Add(item.Key, item.Value);	// Re-populate dictionary to start anew.
-		return true;
-	}
+	return old.honk == 16 && (current.honk == 17 || current.honk == 18);
 }
 
 reset {
@@ -199,6 +211,16 @@ split {
 				return settings[subGoal] && goalList.Value.Count != 0;	// Split if the setting has been selected and the list isn't empty (would otherwise split twice because of the normal goal).
 			}
 		}
+	}
+
+	if (current.crownPin == old.crownPin + 1 && vars.subGoalChecker["crowns"].Contains("crownPin")) {
+		vars.subGoalChecker["crowns"].Remove("crownPin");
+		return settings["crownPin"];
+	}
+
+	if (current.paperCrownPin == old.paperCrownPin + 1 && vars.subGoalChecker["crowns"].Contains("paperCrownPin")) {
+		vars.subGoalChecker["crowns"].Remove("paperCrownPin");
+		return settings["paperCrownPin"];
 	}
 
 	return settings["intro"] && vars.line != null && vars.line.StartsWith("begining intro title sequence");
