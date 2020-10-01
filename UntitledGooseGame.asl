@@ -1,14 +1,10 @@
 state("Untitled") {
 	int honk : "UnityPlayer.dll", 0x1497D10, 0x9C0;
 	int reset: "UnityPlayer.dll", 0x14B1800, 0x330, 0x480;
-	byte crownPin: "UnityPlayer.dll", 0x154AC08, 0x8, 0x0, 0x30, 0x1F10, 0x118, 0x18, 0x20, 0x90, 0xCC;
-	byte paperCrownPin: "UnityPlayer.dll", 0x154AC08, 0x8, 0x0, 0x30, 0x1F18, 0x118, 0x18, 0x20, 0x90, 0xCC;
 }
 
 startup {
-	vars.subGoalChecker = new Dictionary<string, List<string>>{
-		{"crowns", new List<string> {"crownPin", "paperCrownPin"}}
-	};
+	vars.subGoalChecker = new Dictionary<string, List<string>>{};
 	vars.subGoalCheckerClone = new Dictionary<string, List<string>>(); // Create a clone of the dictionary so it can be re-populated.
 	var settingsCreator = new Dictionary<string, string> {
 		{"splits-intro", "intro logo"},
@@ -110,21 +106,19 @@ startup {
 		{"splits-page9", "to do (finally)"},
 			{"page9-goal100", "cross out everything on the to-do list"},
 
-		{"splits-crownPin", "put on the royal crown"},
-		{"splits-paperCrownPin", "put on the paper crown"}
-
+		{"splits-subGoalCrown1", "put on the royal crown"},
+		{"splits-subGoalCrown2", "put on the paper crown"}
 	};
 
 	settings.Add("splits", true, "Splitting on Finished Tasks");
 
 	foreach (var setting in settingsCreator) {
 		settings.Add(setting.Key.Split('-')[1], false, setting.Value, setting.Key.Split('-')[0]); // Add settings.
-		if (setting.Key.Split('-')[1].StartsWith("subGoal")) {									// Check if a subGoal has been recognized.
+		if (setting.Key.Split('-')[1].StartsWith("subGoal"))									// Check if a subGoal has been recognized.
 			if (vars.subGoalChecker.ContainsKey(setting.Key.Split('-')[0]))							// Check if a dictionary key with the goal's name exists.
 				vars.subGoalChecker[setting.Key.Split('-')[0]].Add(setting.Key.Split('-')[1]);				// If true, add the subGoal to that goal's list.
 			else														//
 				vars.subGoalChecker.Add(setting.Key.Split('-')[0], new List<string>{setting.Key.Split('-')[1]});	// If false, create new dictionary key and add the subGoal.
-		}
 	}
 	
 	foreach (var item in vars.subGoalChecker)
@@ -139,6 +133,13 @@ startup {
 		settings.Add("loading", false, "while Loading", "pause");
 		settings.Add("menu", false, "when opening the Menu", "pause");
 		settings.Add("all", false, "while not playing", "pause");
+
+	vars.timerReset = (LiveSplit.Model.Input.EventHandlerT<TimerPhase>)((s, e) => {
+		vars.subGoalChecker.Clear();				// Completely clear dictionary.
+		foreach (var item in vars.subGoalCheckerClone)		//
+			vars.subGoalChecker.Add(item.Key, item.Value);	// Re-populate dictionary to start anew.
+	});
+	timer.OnReset += vars.timerReset;
 }
 
 init {
@@ -158,6 +159,10 @@ init {
 	vars.line = "";
 	vars.reader = new StreamReader(new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 	vars.lastSubGoal = "";
+
+	vars.crownWatcher = new MemoryWatcherList();
+	for (var i = 0; i <= 1; i++)
+		vars.crownWatcher.Add(new MemoryWatcher<int>(new DeepPointer("UnityPlayer.dll", 0x154AC08, 0x8, 0x0, 0x30, 0x1F10 + i * 0x8, 0x118, 0x18, 0x20, 0x90)) { Name = "subGoalCrown" + (i + 1).ToString() });
 }
 
 exit {
@@ -166,23 +171,15 @@ exit {
 }
 
 update {
-	if (vars.reader == null)
-		return false;
+	if (vars.reader == null) return false;
 	vars.line = vars.reader.ReadLine();
 
 	if (vars.line != null && (vars.line.StartsWith("Setting controller maps to UI Mode") || vars.line.StartsWith("unloading. game world active false")))
 		vars.isPaused = true;
-	else if (vars.line != null && (vars.line.StartsWith("Setting controller maps to Gameplay Mode") || vars.line != null && vars.line.StartsWith("loading! game world active true")))
+	else if (vars.line != null && (vars.line.StartsWith("Setting controller maps to Gameplay Mode") || vars.line.StartsWith("loading! game world active true")))
 		vars.isPaused = false;
 
-	current.timerPhase = timer.CurrentPhase;
-	try {
-		if ((old.timerPhase == TimerPhase.Running || old.timerPhase == TimerPhase.Ended) && current.timerPhase == TimerPhase.NotRunning) { // Reset variables when the timer stops. Circumvents delay/lag and incorporates potential manual resets.
-			vars.subGoalChecker.Clear();				// Completely clear dictionary.
-			foreach (var item in vars.subGoalCheckerClone)		//
-				vars.subGoalChecker.Add(item.Key, item.Value);	// Re-populate dictionary to start anew.
-		}
-	} catch {}	// Without the try {} catch {}, this prints an annoying (but harmless) error for 1 iteration.
+	
 }
 
 start {
@@ -213,14 +210,13 @@ split {
 		}
 	}
 
-	if (current.crownPin == old.crownPin + 1 && vars.subGoalChecker["crowns"].Contains("crownPin")) {
-		vars.subGoalChecker["crowns"].Remove("crownPin");
-		return settings["crownPin"];
-	}
-
-	if (current.paperCrownPin == old.paperCrownPin + 1 && vars.subGoalChecker["crowns"].Contains("paperCrownPin")) {
-		vars.subGoalChecker["crowns"].Remove("paperCrownPin");
-		return settings["paperCrownPin"];
+	vars.crownWatcher.UpdateAll(game);
+	for (var i = 0; i <= 1; i++) {
+		var crownID = "subGoalCrown" + (i + 1).ToString();
+		if (vars.crownWatcher[crownID].Changed && vars.crownWatcher[crownID].Current != 0 && settings[crownID] && vars.subGoalChecker["splits"].Contains(crownID)) {
+			vars.subGoalChecker["splits"].Remove(crownID);
+			return true;
+		}
 	}
 
 	return settings["intro"] && vars.line != null && vars.line.StartsWith("begining intro title sequence");
@@ -244,4 +240,8 @@ isLoading {
 			current.honk  == 13 ||
 			current.honk  == 16;
 	}
+}
+
+shutdown {
+	timer.OnReset -= vars.timerReset;
 }
