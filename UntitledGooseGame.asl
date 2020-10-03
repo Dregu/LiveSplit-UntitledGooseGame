@@ -162,7 +162,7 @@ init {
 
 	vars.crownWatcher = new MemoryWatcherList();
 	for (var i = 0; i <= 1; i++)
-		vars.crownWatcher.Add(new MemoryWatcher<bool>(new DeepPointer("UnityPlayer.dll", 0x154AC08, 0x8, 0x0, 0x30, 0x1F10 + i * 0x8, 0x118, 0x18, 0x20, 0x90, 0xCC)) { Name = "c" + i.ToString(), FailAction = MemoryWatcher.ReadFailAction.SetZeroOrNull });
+		vars.crownWatcher.Add(new MemoryWatcher<bool>(new DeepPointer("UnityPlayer.dll", 0x14FF688, 0x10, 0xF0, 0x68, 0x118, 0x28, 0x1D0, 0x38, 0x20, 0x1C8 + i * 0xD8, 0xCC)) { Name = "c" + i.ToString(), FailAction = MemoryWatcher.ReadFailAction.SetZeroOrNull });
 }
 
 exit {
