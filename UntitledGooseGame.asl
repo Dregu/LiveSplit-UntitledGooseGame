@@ -106,8 +106,8 @@ startup {
 		{"splits-page9", "to do (finally)"},
 			{"page9-goal100", "cross out everything on the to-do list"},
 
-		{"splits-subGoalCrown1", "put on the royal crown"},
-		{"splits-subGoalCrown2", "put on the paper crown"}
+		{"splits-c0", "put on the royal crown"},
+		{"splits-c1", "put on the paper crown"}
 	};
 
 	settings.Add("splits", true, "Splitting on Finished Tasks");
@@ -162,7 +162,7 @@ init {
 
 	vars.crownWatcher = new MemoryWatcherList();
 	for (var i = 0; i <= 1; i++)
-		vars.crownWatcher.Add(new MemoryWatcher<int>(new DeepPointer("UnityPlayer.dll", 0x154AC08, 0x8, 0x0, 0x30, 0x1F10 + i * 0x8, 0x118, 0x18, 0x20, 0x90)) { Name = "subGoalCrown" + (i + 1).ToString() });
+		vars.crownWatcher.Add(new MemoryWatcher<bool>(new DeepPointer("UnityPlayer.dll", 0x14FF688, 0x10, 0xF0, 0x68, 0x118, 0x28, 0x1D0, 0x38, 0x20, 0x1C8 + i * 0xD8, 0xCC)) { Name = "c" + i.ToString(), FailAction = MemoryWatcher.ReadFailAction.SetZeroOrNull });
 }
 
 exit {
@@ -178,8 +178,6 @@ update {
 		vars.isPaused = true;
 	else if (vars.line != null && (vars.line.StartsWith("Setting controller maps to Gameplay Mode") || vars.line.StartsWith("loading! game world active true")))
 		vars.isPaused = false;
-
-	
 }
 
 start {
@@ -201,22 +199,18 @@ split {
 	if (vars.line != null && vars.line.StartsWith("awarding: awardSubGoal-subGoal")) {
 		var subGoal = vars.line.Split('-')[1];
 		//print(">>>>> got " + subGoal);
-		foreach (var goalList in vars.subGoalChecker) {
+		foreach (var goalList in vars.subGoalChecker)
 			if (goalList.Value.Contains(subGoal)) {				// Check if any items in the dictionary contain the subGoal.
 				vars.lastSubGoal = subGoal;				// Set lastSubGoal, so a double split can't occur in the above logic.
 				goalList.Value.Remove(subGoal);				// Remove that subGoal from the list (to circumvent duplicate splits).
 				return settings[subGoal] && goalList.Value.Count != 0;	// Split if the setting has been selected and the list isn't empty (would otherwise split twice because of the normal goal).
 			}
-		}
 	}
 
 	vars.crownWatcher.UpdateAll(game);
 	for (var i = 0; i <= 1; i++) {
-		var crownID = "subGoalCrown" + (i + 1).ToString();
-		if (vars.crownWatcher[crownID].Changed && vars.crownWatcher[crownID].Current != 0 && settings[crownID] && vars.subGoalChecker["splits"].Contains(crownID)) {
-			vars.subGoalChecker["splits"].Remove(crownID);
-			return true;
-		}
+		var crownID = "c" + i.ToString();
+		return (current.honk == 17 || current.honk == 18) && current.reset == 4 && vars.crownWatcher[crownID].Changed && vars.crownWatcher[crownID].Current && settings[crownID];
 	}
 
 	return settings["intro"] && vars.line != null && vars.line.StartsWith("begining intro title sequence");
