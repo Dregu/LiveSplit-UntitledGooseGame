@@ -190,42 +190,41 @@ reset {
 }
 
 split {
-	if (vars.line != null && vars.line.StartsWith("saved due to goal")) {
-		var goal = vars.line.Split(' ')[3];
-		//print(">>>>> got " + goal);
-		return settings[goal] && !settings[vars.lastSubGoal];
-	}
-
-	if (vars.line != null && vars.line.StartsWith("awarding: awardSubGoal-subGoal")) {
-		var subGoal = vars.line.Split('-')[1];
-		//print(">>>>> got " + subGoal);
-		foreach (var goalList in vars.subGoalChecker)
-			if (goalList.Value.Contains(subGoal)) {				// Check if any items in the dictionary contain the subGoal.
-				vars.lastSubGoal = subGoal;				// Set lastSubGoal, so a double split can't occur in the above logic.
-				goalList.Value.Remove(subGoal);				// Remove that subGoal from the list (to circumvent duplicate splits).
-				return settings[subGoal] && goalList.Value.Count != 0;	// Split if the setting has been selected and the list isn't empty (would otherwise split twice because of the normal goal).
-			}
-	}
+	if (vars.line != null)
+		if (vars.line.StartsWith("begining intro title sequence"))
+			return settings["intro"];
+		else if (vars.line.StartsWith("saved due to goal")) {
+			var goal = vars.line.Split(' ')[3];
+			//print(">>>>> got " + goal);
+			return settings[goal] && !settings[vars.lastSubGoal];
+		} else if (vars.line.StartsWith("awarding: awardSubGoal-subGoal")) {
+			var subGoal = vars.line.Split('-')[1];
+			//print(">>>>> got " + subGoal);
+			foreach (var goalList in vars.subGoalChecker)
+				if (goalList.Value.Contains(subGoal)) {				// Check if any items in the dictionary contain the subGoal.
+					vars.lastSubGoal = subGoal;				// Set lastSubGoal, so a double split can't occur in the above logic.
+					goalList.Value.Remove(subGoal);				// Remove that subGoal from the list (to circumvent duplicate splits).
+					return settings[subGoal] && goalList.Value.Count != 0;	// Split if the setting has been selected and the list isn't empty (would otherwise split twice because of the normal goal).
+				}
+		}
 
 	vars.crownWatcher.UpdateAll(game);
 	for (var i = 0; i <= 1; i++) {
 		var crownID = "c" + i.ToString();
 		return (current.honk == 17 || current.honk == 18) && current.reset == 4 && vars.crownWatcher[crownID].Changed && vars.crownWatcher[crownID].Current && settings[crownID];
 	}
-
-	return settings["intro"] && vars.line != null && vars.line.StartsWith("begining intro title sequence");
 }
 
 isLoading {
-	if (settings["loading"] && !settings["all"]) {
+	if (settings["loading"] && !settings["all"])
 		return
 			vars.isPaused ||
 			current.honk == 0 ||
 			current.honk == 13;
-	} else if (settings["menu"] && !settings["all"]) {
+	else if (settings["menu"] && !settings["all"])
 		return
 			vars.isPaused;
-	} else if (settings["all"]) {
+	else if (settings["all"])
 		return
 			vars.isPaused ||
 			current.reset == 0 ||
@@ -233,7 +232,6 @@ isLoading {
 			current.honk  == 0 ||
 			current.honk  == 13 ||
 			current.honk  == 16;
-	}
 }
 
 shutdown {
