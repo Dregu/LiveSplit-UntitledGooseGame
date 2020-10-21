@@ -4,9 +4,9 @@ state("Untitled") {
 }
 
 startup {
-  var tB = (Func<string, string, string, Tuple<string, string, string>>) ((elmt1, elmt2, elmt3) => { return Tuple.Create(elmt1, elmt2, elmt3); });
-  var sB = new List<Tuple<string, string, string>> {
-    tB("splits", "intro", "intro logo"),
+	var tB = (Func<string, string, string, Tuple<string, string, string>>) ((elmt1, elmt2, elmt3) => { return Tuple.Create(elmt1, elmt2, elmt3); });
+	var sB = new List<Tuple<string, string, string>> {
+		tB("splits", "intro", "intro logo"),
 		tB("splits", "page1", "to do (garden)"),
 			tB("page1", "goalGarden", "get into the garden"),
 			tB("page1", "goalWet", "get the groundskeeper wet"),
