@@ -143,7 +143,7 @@ split {
 		else if (vars.line.StartsWith("saved due to goal")) {
 			var goal = vars.line.Split(' ')[3];
 			//print(">>>>> got " + goal);
-			return settings[goal] && !settings[vars.lastSubGoal];
+			return settings[goal];
 		}
 }
 
